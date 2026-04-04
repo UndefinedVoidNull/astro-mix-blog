@@ -1,19 +1,66 @@
+---
+import site from '../../site.config.mjs';
+
+interface Props {
+	title?: string;
+	description?: string;
+	canonicalPath?: string;
+}
+
+const {
+	title: titleProp,
+	description: descriptionProp,
+	canonicalPath = '/',
+} = Astro.props;
+
+const title = titleProp ?? site.siteName;
+const description = descriptionProp ?? site.defaultDescription;
+const base = site.siteUrl.replace(/\/$/, '');
+const pathNorm = canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`;
+const canonical = `${base}${pathNorm}`;
+const keywords = site.keywords.join(', ');
+
+const jsonLd = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	name: site.siteName,
+	url: `${base}/`,
+	description: site.defaultDescription,
+};
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="keywords" content={keywords} />
+		<meta name="author" content={site.siteName} />
+		<meta name="robots" content="index, follow" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="canonical" href={canonical} />
+		<meta property="og:type" content="website" />
+		<meta property="og:site_name" content={site.siteName} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		{site.twitterSite && <meta name="twitter:site" content={site.twitterSite} />}
+		<link
+			rel="alternate"
+			type="application/rss+xml"
+			title={site.siteName}
+			href="/feed.xml"
+		/>
 		<meta name="generator" content={Astro.generator} />
-		<title>Askin博客月刊</title>
+		<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	</head>
 	<body>
 		<slot />
 	</body>
 </html>
-
-<style>
-
-
-</style>

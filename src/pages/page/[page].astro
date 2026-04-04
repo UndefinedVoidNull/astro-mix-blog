@@ -1,0 +1,23 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BlogEntries from '../../components/BlogEntries.astro';
+import { entries } from '../../../entries.js';
+import site from '../../../site.config.mjs';
+
+export function getStaticPaths() {
+	const perPage = site.entriesPerPage;
+	const regular = entries.filter((e) => !e.pinned);
+	const totalPages = Math.max(1, Math.ceil(regular.length / perPage));
+	if (totalPages <= 1) return [];
+	return Array.from({ length: totalPages - 1 }, (_, i) => ({
+		params: { page: String(i + 2) },
+	}));
+}
+
+const pageNum = Number(Astro.params.page);
+const title = `${site.siteName} — page ${pageNum}`;
+---
+
+<Layout title={title} description={site.defaultDescription} canonicalPath={`/page/${pageNum}/`}>
+	<BlogEntries pageNum={pageNum} />
+</Layout>

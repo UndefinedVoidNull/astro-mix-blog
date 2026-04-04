@@ -1,0 +1,164 @@
+---
+import BlogShell from './BlogShell.astro';
+import site from '../../site.config.mjs';
+import { entries } from '../../entries.js';
+
+interface Props {
+	pageNum: number;
+}
+
+const { pageNum } = Astro.props;
+const perPage = site.entriesPerPage;
+const newTab = { target: '_blank', rel: 'noopener noreferrer' } as const;
+
+function formatEntryDate(iso: string) {
+	const [y, m, d] = iso.split('-').map(Number);
+	const date = new Date(y, m - 1, d);
+	return date.toLocaleDateString('en-US', {
+		month: 'short',
+		day: 'numeric',
+		year: 'numeric',
+	});
+}
+
+const pinnedEntries = entries.filter((e) => e.pinned);
+const regularEntries = entries.filter((e) => !e.pinned);
+const totalPages = Math.max(1, Math.ceil(regularEntries.length / perPage));
+const safePage = Math.min(Math.max(1, pageNum), totalPages);
+const start = (safePage - 1) * perPage;
+const pageEntries = regularEntries.slice(start, start + perPage);
+const showPinned = safePage === 1;
+---
+
+<BlogShell variant="index">
+	{
+		showPinned && (
+			<div class="pinned-entries">
+				{pinnedEntries.map((e) => (
+					<div class="entry">
+						<div class="entry-title">
+							<a href={encodeURI(e.url)} {...newTab}>
+								{e.title}
+							</a>
+						</div>
+						<div class="entry-meta">{formatEntryDate(e.date)}</div>
+					</div>
+				))}
+			</div>
+		)
+	}
+
+	<div class="entries">
+		{
+			pageEntries.map((e) => (
+				<div class="entry">
+					<div class="entry-title">
+						<a href={encodeURI(e.url)} {...newTab}>
+							{e.title}
+						</a>
+					</div>
+					<div class="entry-meta">{formatEntryDate(e.date)}</div>
+				</div>
+			))
+		}
+	</div>
+
+	{
+		totalPages > 1 && (
+			<nav class="pagination" aria-label="Pagination">
+				{safePage > 1 && (
+					<a
+						class="pagination-link"
+						href={safePage === 2 ? '/' : `/page/${safePage - 1}/`}
+					>
+						«
+					</a>
+				)}
+				{Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+					<a
+						class:list={['pagination-link', { active: n === safePage }]}
+						href={n === 1 ? '/' : `/page/${n}/`}
+						aria-current={n === safePage ? 'page' : undefined}
+					>
+						{n}
+					</a>
+				))}
+				{safePage < totalPages && (
+					<a class="pagination-link" href={`/page/${safePage + 1}/`} rel="next" >
+						»
+					</a>
+				)}
+			</nav>
+		)
+	}
+</BlogShell>
+
+<style is:global>
+	.pinned-entries:empty {
+		display: none;
+	}
+
+	.pinned-entries .entry-title a::before {
+		content: '📌 ';
+	}
+
+	.entries {
+		margin-top: 0;
+	}
+
+	.entry {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 12px 0;
+	}
+
+	.entry-title {
+		flex: 1;
+		font-size: 1em;
+		color: #2c3e50;
+	}
+
+	.entry-title a {
+		color: #2c3e50;
+		text-decoration: none;
+		transition: color 0.3s ease;
+	}
+
+	.entry-title a:hover {
+		color: #00aeee;
+	}
+
+	.entry-meta {
+		font-size: 0.9em;
+		color: #7f8c8d;
+		margin-left: 20px;
+	}
+
+	.pagination {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		gap: 8px;
+		margin: 30px 0;
+		flex-wrap: wrap;
+	}
+
+	.pagination-link {
+		padding: 8px 12px;
+		text-decoration: none;
+		color: #2c3e50;
+		transition: color 0.3s ease;
+		font-size: 0.9em;
+	}
+
+	.pagination-link:hover:not(.active) {
+		color: #00aeee;
+	}
+
+	.pagination-link.active {
+		color: #00aeee;
+		cursor: default;
+		font-weight: 500;
+	}
+</style>

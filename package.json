@@ -1,17 +1,18 @@
 {
-  "name": "new-blog-astro",
+  "name": "astro-mix-blog",
   "type": "module",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "engines": {
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "pre": "node buildHelper.js && astro dev",
+    "prebuild": "node buildHelper.js",
+    "build": "node buildHelper.js && astro build",
+    "clean": "node clean.mjs"
   },
   "dependencies": {
-    "astro": "^6.1.3"
+    "astro": "^6.1.3",
+    "cheerio": "^1.2.0"
   }
 }

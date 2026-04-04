@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Askin&apos;s Blog</title>
+    <link>https://233lol.com/</link>
+    <description>Personal blog feed</description>
+    <language>en</language>
+    <atom:link href="https://233lol.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Markdown测试文档</title>
+      <link>https://233lol.com/post/Markdown%E6%B5%8B%E8%AF%95%E6%96%87%E6%A1%A3.md</link>
+      <guid isPermaLink="true">https://233lol.com/post/Markdown%E6%B5%8B%E8%AF%95%E6%96%87%E6%A1%A3.md</guid>
+      <pubDate>Sat, 04 Apr 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>PROMPT</title>
+      <link>https://233lol.com/post/PROMPT.txt</link>
+      <guid isPermaLink="true">https://233lol.com/post/PROMPT.txt</guid>
+      <pubDate>Sat, 04 Apr 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>中道之国 标注</title>
+      <link>https://233lol.com/post/%E4%B8%AD%E9%81%93%E4%B9%8B%E5%9B%BD%20%E6%A0%87%E6%B3%A8.html</link>
+      <guid isPermaLink="true">https://233lol.com/post/%E4%B8%AD%E9%81%93%E4%B9%8B%E5%9B%BD%20%E6%A0%87%E6%B3%A8.html</guid>
+      <pubDate>Sat, 04 Apr 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Askin博客月刊 第三期 26.03</title>
+      <link>https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E4%B8%89%E6%9C%9F%2026.03.html</link>
+      <guid isPermaLink="true">https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E4%B8%89%E6%9C%9F%2026.03.html</guid>
+      <pubDate>Mon, 30 Mar 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>奥古斯丁 阿奎那 路德 加尔文</title>
+      <link>https://233lol.com/post/%E5%A5%A5%E5%8F%A4%E6%96%AF%E4%B8%81%20%E9%98%BF%E5%A5%8E%E9%82%A3%20%E8%B7%AF%E5%BE%B7%20%E5%8A%A0%E5%B0%94%E6%96%87.png</link>
+      <guid isPermaLink="true">https://233lol.com/post/%E5%A5%A5%E5%8F%A4%E6%96%AF%E4%B8%81%20%E9%98%BF%E5%A5%8E%E9%82%A3%20%E8%B7%AF%E5%BE%B7%20%E5%8A%A0%E5%B0%94%E6%96%87.png</guid>
+      <pubDate>Sun, 29 Mar 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Askin博客月刊 第二期 26.02</title>
+      <link>https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E4%BA%8C%E6%9C%9F%2026.02.html</link>
+      <guid isPermaLink="true">https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E4%BA%8C%E6%9C%9F%2026.02.html</guid>
+      <pubDate>Sat, 28 Feb 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Askin博客月刊 第一期 26.01</title>
+      <link>https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E4%B8%80%E6%9C%9F%2026.01.html</link>
+      <guid isPermaLink="true">https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E4%B8%80%E6%9C%9F%2026.01.html</guid>
+      <pubDate>Fri, 30 Jan 2026 12:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>哲学的天真与危险</title>
+      <link>https://233lol.com/post/%E5%93%B2%E5%AD%A6%E7%9A%84%E5%A4%A9%E7%9C%9F%E4%B8%8E%E5%8D%B1%E9%99%A9.jpg</link>
+      <guid isPermaLink="true">https://233lol.com/post/%E5%93%B2%E5%AD%A6%E7%9A%84%E5%A4%A9%E7%9C%9F%E4%B8%8E%E5%8D%B1%E9%99%A9.jpg</guid>
+      <pubDate>Sun, 07 Dec 2025 12:00:00 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

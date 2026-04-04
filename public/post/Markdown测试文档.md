@@ -1,11 +1,3 @@
-# 人工智能的社会学
-
-## 经-史-生成
-
-## 测试
-
-![alt text](images/test/image.png)
-
 # h1
 
 ## h2
