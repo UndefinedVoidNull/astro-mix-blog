@@ -1,5 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import rehypeKatex from 'rehype-katex';
+import remarkMath from 'remark-math';
 
 // Keep in sync with `SITE_CONFIG.siteUrl` in site.config.mjs (no process.env).
 export default defineConfig({
@@ -8,5 +10,10 @@ export default defineConfig({
 	build: {
 		// Match `public/post/*.html` layout (single file, not `*.html/index.html`).
 		format: 'file',
+	},
+	markdown: {
+		remarkPlugins: [ remarkMath ],
+		rehypePlugins: [ [rehypeKatex, {output: "mathml"}] ],
+
 	},
 });
