@@ -1,6 +1,5 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
 ---
 
 <Layout>
@@ -9,9 +8,9 @@ import { Image } from 'astro:assets';
             <div class="header-title">
                 <div>
                     <h1><a href="index.html">Askin's Blog</a></h1>
-                    <p>清泉流响山林静, 薄雾迷离景更深</p>
+                    <p><a href="https://ciallo.cc/" target="_blank">Ciallo ~(∠・ω<)⌒★</a></p>
                 </div>
-                <a href="about.html" class="avatar-link"><img src="/avatar.png" alt="Avatar" class="avatar"></a>
+                <a href="/about" class="avatar-link"><img src="/avatar.png" alt="About Page" class="avatar"></a>
             </div>
             <!-- <nav>
                 <a href="index.html">Home</a>
@@ -19,73 +18,16 @@ import { Image } from 'astro:assets';
             </nav> -->
         </header>
         
-        <div class="pinned-entries">
-            <!-- PINNED_ENTRIES_START -->
-
-            <!-- PINNED_ENTRIES_END -->
+        <div class="content">
+            <!-- <h2>About Me</h2>
+            <p>Hi, I'm Askin. </p> -->
+            
+            <h2>About</h2>
+            <p><a href="archives.html" target="_blank">Archives</a></p>
+            <p><a href="feed.xml" target="_blank">RSS Feed</a></p>
+            <p><a href="https://github.com/UndefinedVoidNull/UndefinedVoidNull.github.io" target="_blank">PDF Blog</a></p>
         </div>
-        
-        <div class="entries">
-            <!-- GENERATED_ENTRIES_START -->
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/Askin博客月刊 第三期 26.03.pdf" target="_blank">Askin博客月刊 第三期 26.03</a>
-                </div>
-                <div class="entry-meta">Mar 30, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/Askin博客月刊 第二期 26.02.pdf" target="_blank">Askin博客月刊 第二期 26.02</a>
-                </div>
-                <div class="entry-meta">Feb 28, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/Askin博客月刊 第一期 26.01.pdf" target="_blank">Askin博客月刊 第一期 26.01</a>
-                </div>
-                <div class="entry-meta">Jan 31, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/Windows阅读PDF书籍的最佳实践探索.pdf" target="_blank">Windows阅读PDF书籍的最佳实践探索</a>
-                </div>
-                <div class="entry-meta">Jan 19, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/打瓦读书法.pdf" target="_blank">打瓦读书法</a>
-                </div>
-                <div class="entry-meta">Jan 13, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/第一次体验共享Scooter (Veo).pdf" target="_blank">第一次体验共享Scooter (Veo)</a>
-                </div>
-                <div class="entry-meta">Jan 13, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/Command Line Tools.pdf" target="_blank">Command Line Tools</a>
-                </div>
-                <div class="entry-meta">Jan 13, 2026</div>
-            </div>
-
-            <div class="entry">
-                <div class="entry-title">
-                    <a href="pdfs/Onenote打印出不截断的PDF的方法.pdf" target="_blank">Onenote打印出不截断的PDF的方法</a>
-                </div>
-                <div class="entry-meta">Jan 13, 2026</div>
-            </div>
-
-            <!-- GENERATED_ENTRIES_END -->
-        </div>
+    </div>
 </Layout>
 
 <style>
@@ -276,4 +218,5 @@ nav a:hover {
     cursor: default;
     font-weight: 500;
 }
+
 </style>
