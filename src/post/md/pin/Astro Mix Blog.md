@@ -28,7 +28,7 @@ pnpm i # install packages
 
 pnpm pre # prebuild and preview(dev)
 
-pnpm build # prebuild and build
-
 pnpm clean # remove all generated files
+
+pnpm build # clean, prebuild and build
 ```
