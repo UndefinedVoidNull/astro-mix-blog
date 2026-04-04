@@ -6,9 +6,9 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "pre": "node buildHelper.js && astro dev",
-    "prebuild": "node buildHelper.js",
-    "build": "node buildHelper.js && astro build",
+    "pre": "node prebuild.js && astro dev",
+    "prebuild": "node prebuild.js",
+    "build": "node prebuild.js && astro build",
     "clean": "node clean.mjs"
   },
   "dependencies": {

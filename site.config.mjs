@@ -1,5 +1,5 @@
 /**
- * Shared by `buildHelper.js` (Node) and Astro. Single source of truth — no generated JSON copy.
+ * Shared by `prebuild.js` (Node) and Astro. Single source of truth — no generated JSON copy.
  * Do not use process.env for the public site URL; set `siteUrl` here (and match `astro.config.mjs` `site`).
  */
 export const SITE_CONFIG = {
