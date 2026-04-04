@@ -1,4 +1,5 @@
 ---
+import Image from 'astro/components/Image.astro';
 import site from '../../site.config.mjs';
 
 interface Props {
@@ -28,14 +29,12 @@ const newTab = { target: '_blank', rel: 'noopener noreferrer' } as const;
 					}
 				</div>
 				<a href="/about.html" class="avatar-link">
-					<img
+					<Image
 						src="/avatar.png"
 						alt={variant === 'about' ? 'About' : `About — ${site.siteName}`}
 						class="avatar"
 						width="100"
 						height="100"
-						loading="lazy"
-						decoding="async"
 					/>
 				</a>
 			</div>
