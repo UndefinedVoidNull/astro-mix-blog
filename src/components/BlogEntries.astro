@@ -69,7 +69,7 @@ const showPinned = safePage === 1;
 				{safePage > 1 && (
 					<a
 						class="pagination-link"
-						href={safePage === 2 ? '/' : `/page/${safePage - 1}/`}
+						href={safePage === 2 ? '/' : `/page/${safePage - 1}.html`}
 					>
 						«
 					</a>
@@ -77,14 +77,14 @@ const showPinned = safePage === 1;
 				{Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
 					<a
 						class:list={['pagination-link', { active: n === safePage }]}
-						href={n === 1 ? '/' : `/page/${n}/`}
+						href={n === 1 ? '/' : `/page/${n}.html`}
 						aria-current={n === safePage ? 'page' : undefined}
 					>
 						{n}
 					</a>
 				))}
 				{safePage < totalPages && (
-					<a class="pagination-link" href={`/page/${safePage + 1}/`} rel="next" >
+					<a class="pagination-link" href={`/page/${safePage + 1}.html`} rel="next" >
 						»
 					</a>
 				)}

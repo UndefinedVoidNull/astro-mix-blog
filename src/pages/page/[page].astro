@@ -18,6 +18,6 @@ const pageNum = Number(Astro.params.page);
 const title = `${site.siteName} — page ${pageNum}`;
 ---
 
-<Layout title={title} description={site.defaultDescription} canonicalPath={`/page/${pageNum}/`}>
+<Layout title={title} description={site.defaultDescription} canonicalPath={`/page/${pageNum}.html`}>
 	<BlogEntries pageNum={pageNum} />
 </Layout>

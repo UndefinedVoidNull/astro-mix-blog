@@ -15,16 +15,18 @@
 
 ## Dependencies
 - Node.js
-- pnpm
 - cheerio
 - Astro
-- Quarto
+- pnpm (Optional)
+- Quarto (Optional)
 
 ## Get Started
 ```bash
 pnpm i
 
 pnpm build
+
+pnpm pre # prebuild and preview
 
 pnpm dev
 

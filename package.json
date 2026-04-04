@@ -7,8 +7,9 @@
   },
   "scripts": {
     "pre": "node prebuild.js && astro dev",
-    "prebuild": "node prebuild.js",
     "build": "node prebuild.js && astro build",
+    "dev": "astro dev",
+    "prebuild": "node prebuild.js",
     "clean": "node clean.mjs"
   },
   "dependencies": {

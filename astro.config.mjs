@@ -5,4 +5,8 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'https://233lol.com',
 	trailingSlash: 'ignore',
+	build: {
+		// Match `public/post/*.html` layout (single file, not `*.html/index.html`).
+		format: 'file',
+	},
 });

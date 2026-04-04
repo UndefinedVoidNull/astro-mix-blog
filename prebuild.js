@@ -5,11 +5,16 @@ import { fileURLToPath } from 'node:url';
 import { execSync } from 'node:child_process';
 import { load } from 'cheerio';
 import SITE_CONFIG from './site.config.mjs';
+import {
+	BRACKET_TITLE_RE,
+	processedMdEntryHtmlFilename,
+	stripBracketDateFromRelativePath,
+	stripBracketDateFromStem,
+} from './postBracketFilename.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = __dirname;
 const POST_ROOT = path.join(ROOT, 'src', 'post');
-const BRACKET_TITLE_RE = /^\[(\d{4}-\d{2}-\d{2})\](.*)$/;
 
 function siteUrlBase() {
 	return SITE_CONFIG.siteUrl.replace(/\/$/, '');
@@ -65,9 +70,8 @@ function listFilesRecursive(dir) {
 function htmlOutputFileName(filename) {
 	const ext = path.extname(filename);
 	const stem = path.basename(filename, ext);
-	const m = stem.match(BRACKET_TITLE_RE);
-	const rest = m ? (m[2] || '').trim() : stem;
-	const safe = (rest || 'post').replace(/[<>:"/\\|?*\x00-\x1f]/g, '_');
+	const stripped = stripBracketDateFromStem(stem);
+	const safe = (stripped || 'post').replace(/[<>:"/\\|?*\x00-\x1f]/g, '_');
 	return `${safe}${ext}`;
 }
 
@@ -215,6 +219,85 @@ function toUrlPosix(...segments) {
 	return '/' + path.posix.join(...segments.filter(Boolean));
 }
 
+/**
+ * Minimal frontmatter parse for `title` / `date` strings (YAML one-liners).
+ * Falls back to filename parsing when missing.
+ */
+function parseSimpleFrontmatter(raw) {
+	if (typeof raw !== 'string' || !raw.startsWith('---')) return {};
+	const rest = raw.slice(3);
+	const end = rest.search(/\r?\n---\r?\n|\r?\n---$/);
+	if (end === -1) return {};
+	const block = rest.slice(0, end).trim();
+	const fm = {};
+	for (const line of block.split(/\r?\n/)) {
+		const m = line.match(/^\s*([a-zA-Z_][\w]*)\s*:\s*(.+)$/);
+		if (!m) continue;
+		let v = m[2].trim();
+		if (
+			(v.startsWith('"') && v.endsWith('"')) ||
+			(v.startsWith("'") && v.endsWith("'"))
+		) {
+			v = v.slice(1, -1);
+		}
+		fm[m[1]] = v;
+	}
+	return fm;
+}
+
+function listMdFilesUnder(dir) {
+	const out = [];
+	if (!fs.existsSync(dir)) return out;
+
+	function walk(d) {
+		for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+			if (e.name === 'archives' || e.name === 'node_modules' || e.name === '.git') continue;
+			const full = path.join(d, e.name);
+			if (e.isDirectory()) {
+				walk(full);
+			} else if (full.toLowerCase().endsWith('.md')) {
+				out.push(full);
+			}
+		}
+	}
+	walk(dir);
+	return out;
+}
+
+function registerMdEntries(mdRootAbs) {
+	const mdRoot = path.resolve(mdRootAbs);
+	if (!fs.existsSync(mdRoot)) return;
+
+	for (const full of listMdFilesUnder(mdRoot)) {
+		const rel = path.relative(mdRoot, full);
+		const publicFile = processedMdEntryHtmlFilename(path.basename(full));
+		const url = toUrlPosix('post', publicFile);
+
+		let title;
+		let date;
+		try {
+			const raw = fs.readFileSync(full, 'utf8');
+			const fm = parseSimpleFrontmatter(raw);
+			const parsed = parseName(full);
+			title =
+				typeof fm.title === 'string' && fm.title.trim()
+					? fm.title.trim()
+					: parsed.title;
+			date =
+				typeof fm.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(fm.date.trim())
+					? fm.date.trim()
+					: parsed.date;
+		} catch {
+			const parsed = parseName(full);
+			title = parsed.title;
+			date = parsed.date;
+		}
+
+		const entryPinned = entryPinnedForSourceTree(false, mdRoot, mdRoot, rel);
+		entries.push({ title, date, url, ...(entryPinned ? { pinned: true } : {}) });
+	}
+}
+
 /** Pinned layout: src/post/{file,html,qmd}/pin/... → /public/post/pin/... and entries.pinned */
 function isPinSubfolderRel(rel) {
 	return rel.split(path.sep)[0] === 'pin';
@@ -240,11 +323,12 @@ function copyFileTree(srcDir, destDir, urlPrefixSegments, pinned) {
 	const files = listFilesRecursive(srcDir);
 	for (const full of files) {
 		const rel = path.relative(srcDir, full);
-		const dest = path.join(destDir, rel);
+		const outRel = stripBracketDateFromRelativePath(rel);
+		const dest = path.join(destDir, outRel);
 		fs.mkdirSync(path.dirname(dest), { recursive: true });
 		fs.copyFileSync(full, dest);
 		const { date, title } = parseName(full);
-		const url = toUrlPosix(...urlPrefixSegments, ...rel.split(path.sep));
+		const url = toUrlPosix(...urlPrefixSegments, ...outRel.split(path.sep));
 		const entryPinned = entryPinnedForSourceTree(pinned, srcDir, mainRoot, rel);
 		entries.push({ title, date, url, ...(entryPinned ? { pinned: true } : {}) });
 	}
@@ -281,23 +365,59 @@ async function processHtmlDir(srcDir, destDir, urlPrefixSegments, pinned, inject
 }
 
 /**
+ * Quarto's glob layer treats `[` / `]` in paths as character classes and throws
+ * (e.g. `[2026-02-28]CSS-Styles.qmd`). Copy into a short-lived bridge file with a
+ * safe basename when needed.
+ */
+function qmdBasenameNeedsQuartoBridge(basename) {
+	return /[[\]]/.test(basename);
+}
+
+/**
  * Quarto treats --output-dir as relative to the .qmd directory, so a path like
  * "public/post" ends up under src/post/qmd/public/post. Use an absolute path so
  * output always lands in the repo's public/post (or pin) folder.
+ * @returns {boolean} true when a bridge copy was used (output HTML basename is already stripped)
  */
 function renderQuarto(qmdPath, outputDirAbs) {
-	const relQmd = path.relative(ROOT, path.resolve(qmdPath)).split(path.sep).join('/');
+	const abs = path.resolve(qmdPath);
+	const base = path.basename(abs);
 	const absOutDir = path.resolve(outputDirAbs);
 	fs.mkdirSync(absOutDir, { recursive: true });
 	const outDirArg = absOutDir.split(path.sep).join('/');
-	execSync(
-		`quarto render "${relQmd}" --to html --embed-resources --output-dir "${outDirArg}"`,
-		{
-			cwd: ROOT,
-			stdio: 'inherit',
-			shell: true,
-		},
-	);
+
+	let relQmd;
+	let bridgeDir = null;
+
+	if (qmdBasenameNeedsQuartoBridge(base)) {
+		const stem = path.basename(abs, '.qmd');
+		const cleanStem = stripBracketDateFromStem(stem);
+		const id = crypto.createHash('sha256').update(abs).digest('hex').slice(0, 16);
+		bridgeDir = path.join(ROOT, '.quarto-prebuild', id);
+		fs.mkdirSync(bridgeDir, { recursive: true });
+		const bridgeFile = path.join(bridgeDir, `${cleanStem}.qmd`);
+		fs.copyFileSync(abs, bridgeFile);
+		relQmd = path.relative(ROOT, bridgeFile).split(path.sep).join('/');
+	} else {
+		relQmd = path.relative(ROOT, abs).split(path.sep).join('/');
+	}
+
+	try {
+		execSync(
+			`quarto render "${relQmd}" --to html --embed-resources --output-dir "${outDirArg}"`,
+			{
+				cwd: ROOT,
+				stdio: 'inherit',
+				shell: true,
+			},
+		);
+	} finally {
+		if (bridgeDir && fs.existsSync(bridgeDir)) {
+			fs.rmSync(bridgeDir, { recursive: true, force: true });
+		}
+	}
+
+	return Boolean(bridgeDir);
 }
 
 function removeStrayQuartoOutputUnderQmd(srcDir) {
@@ -320,15 +440,63 @@ function processQmdDir(srcDir, outputDirAbs, urlPrefixSegments, pinned) {
 	const outRoot = path.resolve(outputDirAbs);
 	fs.mkdirSync(outRoot, { recursive: true });
 	for (const full of files) {
-		renderQuarto(full, outRoot);
+		const bridged = renderQuarto(full, outRoot);
 		const { date, title } = parseName(full);
 		const stem = path.basename(full, '.qmd');
-		const outHtml = `${stem}.html`;
-		const rel = path.relative(srcDir, path.dirname(full));
+		const cleanStem = stripBracketDateFromStem(stem);
+		const outHtml = `${cleanStem}.html`;
+		const relDir = path.relative(srcDir, path.dirname(full));
+		const targetDir =
+			relDir && relDir !== '.' ? path.join(outRoot, relDir) : outRoot;
+		const targetHtml = path.join(targetDir, outHtml);
+
+		if (bridged) {
+			const flatHtml = path.join(outRoot, outHtml);
+			if (flatHtml !== targetHtml) {
+				fs.mkdirSync(targetDir, { recursive: true });
+				if (fs.existsSync(flatHtml)) {
+					if (fs.existsSync(targetHtml)) fs.rmSync(targetHtml);
+					fs.renameSync(flatHtml, targetHtml);
+				}
+				const flatFiles = path.join(outRoot, `${cleanStem}_files`);
+				const targetFiles = path.join(targetDir, `${cleanStem}_files`);
+				if (fs.existsSync(flatFiles) && flatFiles !== targetFiles) {
+					if (fs.existsSync(targetFiles)) {
+						fs.rmSync(targetFiles, { recursive: true, force: true });
+					}
+					fs.renameSync(flatFiles, targetFiles);
+				}
+			}
+		} else {
+			const tryPaths = [];
+			if (relDir && relDir !== '.') {
+				tryPaths.push(path.join(outRoot, relDir, `${stem}.html`));
+			}
+			tryPaths.push(path.join(outRoot, `${stem}.html`));
+			let found = null;
+			for (const p of tryPaths) {
+				if (fs.existsSync(p)) {
+					found = p;
+					break;
+				}
+			}
+			if (found) {
+				const d = path.dirname(found);
+				const target = path.join(d, outHtml);
+				if (found !== target) {
+					fs.renameSync(found, target);
+				}
+				const oldFiles = path.join(d, `${stem}_files`);
+				const newFiles = path.join(d, `${cleanStem}_files`);
+				if (fs.existsSync(oldFiles) && oldFiles !== newFiles) {
+					fs.renameSync(oldFiles, newFiles);
+				}
+			}
+		}
 		const url =
-			rel === '.' || rel === ''
+			relDir === '.' || relDir === ''
 				? toUrlPosix(...urlPrefixSegments, outHtml)
-				: toUrlPosix(...urlPrefixSegments, ...rel.split(path.sep), outHtml);
+				: toUrlPosix(...urlPrefixSegments, ...relDir.split(path.sep), outHtml);
 		const relFile = path.relative(srcDir, full);
 		const entryPinned = entryPinnedForSourceTree(pinned, srcDir, mainRoot, relFile);
 		entries.push({ title, date, url, ...(entryPinned ? { pinned: true } : {}) });
@@ -367,6 +535,9 @@ async function main() {
 
 	const pinQmd = path.join(pinRoot, 'qmd');
 	processQmdDir(pinQmd, publicPostPin, ['post', 'pin'], true);
+
+	const mdDir = path.join(POST_ROOT, 'md');
+	registerMdEntries(mdDir);
 
 	const sorted = [...entries].sort((a, b) => {
 		if (a.date !== b.date) return a.date < b.date ? 1 : -1;
@@ -458,13 +629,13 @@ function writeSitemapXml(sortedEntries) {
 	};
 
 	add(`${base}/`, { changefreq: 'daily', priority: '1.0' });
-	add(`${base}/about`, { changefreq: 'monthly', priority: '0.6' });
+	add(`${base}/about.html`, { changefreq: 'monthly', priority: '0.6' });
 
 	const regular = sortedEntries.filter((e) => !e.pinned);
 	const perPage = SITE_CONFIG.entriesPerPage;
 	const totalPages = Math.max(1, Math.ceil(regular.length / perPage));
 	for (let p = 2; p <= totalPages; p++) {
-		add(`${base}/page/${p}/`, { changefreq: 'weekly', priority: '0.7' });
+		add(`${base}/page/${p}.html`, { changefreq: 'weekly', priority: '0.7' });
 	}
 
 	for (const e of sortedEntries) {

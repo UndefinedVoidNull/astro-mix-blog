@@ -1,6 +1,5 @@
 ---
 title: "Command Line Tools"
-date: "2025-01-30"
 categories: [Code, Powershell]
 ---
 

@@ -1,6 +1,5 @@
 ---
 title: "Scrcpy Wireless Android Casting"
-date: "2025-01-17"
 categories: [Android]
 ---
 

@@ -1,0 +1,209 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { processedMdEntryHtmlFilename, stripBracketDateFromStem } from '../../../postBracketFilename.mjs';
+
+export async function getStaticPaths() {
+	const modules = import.meta.glob('../../post/md/**/*.md');
+	const out: {
+		params: { name: string };
+		props: {
+			pageTitle: string;
+			description: string;
+			Content: (props: Record<string, unknown>) => unknown;
+		};
+	}[] = [];
+
+	for (const [file, load] of Object.entries(modules)) {
+		const norm = file.replace(/\\/g, '/');
+		const needle = 'post/md/';
+		const i = norm.toLowerCase().lastIndexOf(needle);
+		if (i === -1) continue;
+		const rel = norm.slice(i + needle.length);
+		const mdBasename = rel.split('/').pop();
+		if (!mdBasename || !mdBasename.toLowerCase().endsWith('.md')) continue;
+
+		const publicFile = processedMdEntryHtmlFilename(mdBasename);
+		const paramName = publicFile.toLowerCase().endsWith('.html')
+			? publicFile.slice(0, -'.html'.length)
+			: publicFile;
+		const mod = (await load()) as {
+			frontmatter?: { title?: string; description?: string };
+			Content: (props: Record<string, unknown>) => unknown;
+		};
+		const fm = mod.frontmatter ?? {};
+		const stem = mdBasename.replace(/\.md$/i, '');
+		const titleFallback = stripBracketDateFromStem(stem);
+		const pageTitle =
+			typeof fm.title === 'string' && fm.title.trim() ? fm.title.trim() : titleFallback;
+		const description =
+			typeof fm.description === 'string' && fm.description.trim()
+				? fm.description.trim()
+				: pageTitle;
+
+		out.push({
+			params: { name: paramName },
+			props: {
+				pageTitle,
+				description,
+				Content: mod.Content,
+			},
+		});
+	}
+
+	return out;
+}
+
+const { pageTitle, description, Content } = Astro.props;
+const name = Astro.params.name ?? '';
+const canonicalPath = `/post/${name.split('/').map(encodeURIComponent).join('/')}.html`;
+---
+
+<Layout title={pageTitle} description={description} canonicalPath={canonicalPath}>
+	<div class="md-standalone">
+		<div class="md-standalone-inner">
+			<article class="content md-post">
+				<header class="md-post-header">
+					<h1 class="md-post-title">{pageTitle}</h1>
+				</header>
+				<div class="md-post-body">
+					<Content />
+				</div>
+			</article>
+		</div>
+	</div>
+</Layout>
+
+<style is:global>
+	.md-post-header {
+		display: none;
+	}
+
+	.md-standalone {
+		min-height: 100vh;
+		font-family:
+			-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+		line-height: 1.6;
+		color: #333;
+		background-color: #f5f5f5;
+		padding: 60px 0 100px 0;
+		box-sizing: border-box;
+	}
+
+	.md-standalone-inner {
+		max-width: 800px;
+		margin: 0 auto;
+		background: white;
+		padding: 20px 40px 40px 40px;
+		border-radius: 8px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	.md-post-body a {
+		color: #00aeee;
+		text-decoration: none;
+		transition: color 0.3s ease;
+	}
+
+	.md-post-header {
+		margin-bottom: 1.25rem;
+		padding-bottom: 1rem;
+		border-bottom: 1px solid #eee;
+	}
+
+	.md-post-title {
+		font-size: 1.75em;
+		color: #2c3e50;
+		margin: 0;
+		line-height: 1.25;
+	}
+
+	.md-post-body {
+		max-width: 100%;
+		overflow-wrap: anywhere;
+	}
+
+	.md-post-body h1 {
+		font-size: 2em;
+		color: #2c3e50;
+	}
+
+	.md-post-body h2 {
+		font-size: 1.25em;
+	}
+
+	.md-post-body h3,
+	.md-post-body h4 {
+		color: #2c3e50;
+	}
+
+	.md-post-body ul,
+	.md-post-body ol {
+		color: black;
+	}
+
+	.md-post-body li {
+		margin-bottom: 0.35rem;
+	}
+
+	.md-post-body pre {
+		margin: 0 0 15px 0;
+		padding: 12px 14px;
+		overflow-x: auto;
+		background: #f8f9fa;
+		border-radius: 6px;
+		border: 1px solid #e9ecef;
+		font-size: 0.9em;
+		line-height: 1.45;
+	}
+
+	.md-post-body code {
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+			monospace;
+		font-size: 0.92em;
+	}
+
+	.md-post-body p code,
+	.md-post-body li code {
+		background: #f1f3f5;
+		padding: 0.12em 0.35em;
+		border-radius: 4px;
+	}
+
+	.md-post-body pre code {
+		background: transparent;
+		padding: 0;
+		font-size: inherit;
+	}
+
+	.md-post-body blockquote {
+		margin: 0 0 15px 0;
+		padding: 8px 14px;
+		border-left: 4px solid #00aeee;
+		color: #555;
+		background: #fafbfc;
+	}
+
+	.md-post-body img {
+		max-width: 100%;
+		height: auto;
+		border-radius: 4px;
+	}
+
+	.md-post-body table {
+		width: 100%;
+		border-collapse: collapse;
+		margin-bottom: 15px;
+		font-size: 0.95em;
+	}
+
+	.md-post-body th,
+	.md-post-body td {
+		border: 1px solid #dee2e6;
+		padding: 8px 10px;
+		text-align: left;
+	}
+
+	.md-post-body th {
+		background: #f8f9fa;
+	}
+</style>

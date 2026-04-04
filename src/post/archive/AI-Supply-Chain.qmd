@@ -1,6 +1,5 @@
 ---
 title: "AI Supply Chain"
-date: "2025-02-12"
 categories: [Record, AI]
 ---
 
