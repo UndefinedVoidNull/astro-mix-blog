@@ -62,9 +62,9 @@ const canonicalPath = `/post/${name.split('/').map(encodeURIComponent).join('/')
 	<div class="md-standalone">
 		<div class="md-standalone-inner">
 			<article class="content md-post">
-				<header class="md-post-header">
+				<!-- <header class="md-post-header">
 					<h1 class="md-post-title">{pageTitle}</h1>
-				</header>
+				</header> -->
 				<div class="md-post-body">
 					<Content />
 				</div>
@@ -74,17 +74,14 @@ const canonicalPath = `/post/${name.split('/').map(encodeURIComponent).join('/')
 </Layout>
 
 <style is:global>
-	.md-post-header {
-		display: none;
-	}
-
+	
 	.md-standalone {
 		min-height: 100vh;
 		font-family:
 			-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 		line-height: 1.6;
-		color: #333;
-		background-color: #f5f5f5;
+		color: black;
+		/* background-color: #f5f5f5; */
 		padding: 60px 0 100px 0;
 		box-sizing: border-box;
 	}
@@ -93,9 +90,9 @@ const canonicalPath = `/post/${name.split('/').map(encodeURIComponent).join('/')
 		max-width: 800px;
 		margin: 0 auto;
 		background: white;
-		padding: 20px 40px 40px 40px;
+		padding: 20px 40px 40px;
 		border-radius: 8px;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		/* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
 	}
 
 	.md-post-body a {
@@ -112,7 +109,6 @@ const canonicalPath = `/post/${name.split('/').map(encodeURIComponent).join('/')
 
 	.md-post-title {
 		font-size: 1.75em;
-		color: #2c3e50;
 		margin: 0;
 		line-height: 1.25;
 	}
@@ -124,25 +120,24 @@ const canonicalPath = `/post/${name.split('/').map(encodeURIComponent).join('/')
 
 	.md-post-body h1 {
 		font-size: 2em;
-		color: #2c3e50;
 	}
 
 	.md-post-body h2 {
 		font-size: 1.25em;
 	}
 
-	.md-post-body h3,
-	.md-post-body h4 {
-		color: #2c3e50;
-	}
-
-	.md-post-body ul,
-	.md-post-body ol {
-		color: black;
-	}
-
 	.md-post-body li {
 		margin-bottom: 0.35rem;
+	}
+
+	.md-post-body p, 
+	.md-post-body li,
+	.md-post-body td {
+		color: rgb(63, 63, 63);
+	}
+
+	.md-post-body strong {
+		color: black;
 	}
 
 	.md-post-body pre {
