@@ -2,15 +2,21 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://233lol.com/</loc>
-    <lastmod>2026-04-05</lastmod>
+    <lastmod>2026-04-30</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://233lol.com/about.html</loc>
-    <lastmod>2026-04-05</lastmod>
+    <lastmod>2026-04-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://233lol.com/post/Askin%E5%8D%9A%E5%AE%A2%E6%9C%88%E5%88%8A%20%E7%AC%AC%E5%9B%9B%E6%9C%9F%2026.04.html</loc>
+    <lastmod>2026-04-30</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://233lol.com/post/Astro-Mix-Blog.html</loc>
